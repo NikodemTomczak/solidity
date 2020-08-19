@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Address Alias Service</title>
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+<style>* {bordger:1px solid black;}</style>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+<div class="row justify-content-center">
+<div class="col-10 justify-content-center">
+<div class="row text-center mt-2">
+<div class="col-12">
+<h1 class="">Ethereum Address Alias Service <span class="small text-danger">beta</span></h1>
+<hr/>
+</div>
+</div>
+<div class="row error-window hidden">
+<p>This Decentralized Application requires access to the Ethereum network. Download Metamask.</p>
+<a href="https://metamask.io"  target="_blank"><img src="assets/download-metamask.png" class="img-fluid"></a>
+</div>
+<div class="row main-window">
+<div class="col-12 ml-auto">
+<div class="row">
+<div class="col-9">
+<p class=" small">Account: <span id="account"></span><br>ETH balance: <span id="eth_owned">0</span> ETH<br></p>
+</div>
+<div class="col-3 small">
+<p id="log" class=""></p>
+</div>
+</div>
+<hr>
+<div class="row">
+<div class="col-6">
+<div class="row  mb-2">
+<div class="col-12">
+<h3>Add alias to your list</h3>
+</div>
+</div>
+<form id="setAliasForm" class="form">
+<fieldset class="alias_fieldset form-group">
+<input class="mt-2 form-control form-control-lg"  type="text" name="eth_address"  id="eth_address" placeholder="Ethereum address" style="font-size: 13px!important;">
+<input class="mt-2 form-control form-control-lg"  type="text" name="alias" id="alias" placeholder="Alias (from 4 to 32 letters)" style="font-size: 13px!important;">
+<button class="btn btn-large btn-block btn-primary mt-2 p-2" id="set_alias_btn" type="submit" >Add your alias to list</button>
+</fieldset>
+</form>
+<div class="alias_list row mt-2 mb-2">
+<div class="col-12">
+<h3>Your aliases</h3>
+<div class="dapp_aliases">
+</div>							
+</div>
+</div>
+<div class="row">
+<p>List price :<span class="dapp_price"></span></p>
+</div>
+<div class="row">
+<form id="setPriceForm" class="form">
+<fieldset class="small price_fieldset">
+<input class="mt-2 form-control form-control-lg"  type="number"  step="0.0001" e="price_eth"  id="price_eth" placeholder="Price (0 to 1 ETH)" style="font-size: 13px!important;">
+<button class="btn btn-large btn-block btn-primary mt-2 p-2" id="set_price_btn" type="submit"  >Set price</button>
+</fieldset>
+</form>
+</div>
+</div>
+<div class="col-6">
+<div class="row  mb-2">
+<div class="col-12">
+<h3>User's lists</h3>
+</div>
+</div>
+<div class="row">
+<form id="select_user_form" class="form">
+<fieldset class=" select_user_fieldset">
+<select style="font-size: 13px !important;" name="select_user" id="select_user" class="form-control small">
+</select>
+</fieldset>
+</form>
+</div>
+<div class="row mt-3 no_permission">
+<div class="col-12">
+<p>You have no permission to access this user list.</p>
+<p>Price (set by user): <span class="price_user"></span>ETH</p>
+<form id="getPermission" class="form mb-3">
+<fieldset class="small getPermission_fieldset">
+<button class="btn btn-large btn-block btn-primary mt-2 p-2" id="get_permission_btn" type="submit">Get permission</button>
+</fieldset>
+</form>
+</div>
+</div>
+<div class="alias_list_user row mt-4 mb-2">
+<div class="col-12">
+<div>You can delegate permission to an address</div>
+<p>Price (set by user): <span class="price_user_delegate"></span></p>
+<form id="getDelegatedPermission" class="form">
+<fieldset class="small getPermissionDelegated_fieldset">
+<input class="mt-2 form-control form-control-lg"  type="text" name="eth_address_delegate"  id="eth_address_delegate" placeholder="Ethereum address" style="font-size: 13px!important;">
+<button class="btn btn-large btn-block btn-primary mt-2 p-2" id="get_permission_delegated_btn" type="submit">Delegate permission</button>
+</fieldset>
+</form>
+<div class="dapp_user_aliases mt-4">
+</div>
+</div>
+</div>				
+</div>
+</div>
+</div>
+</div>
+<div class="modal" id="transaction_modal">
+<div class="modal-dialog modal-dialog-centered" >
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="">Transaction sent</h5>
+</div>
+<div class="modal-body">
+<p>Please wait...<i class="fa fa-spinner fa-spin"></i></p>
+<p>It may take some time before the transaction is added to the blockchain</p>
+</div>
+</div>
+</div>
+</div>
+<div class="row mt-4 pt-4">
+<ol>
+<li>Build your own list of address aliases.</li>
+<li>Retrieve and update address using aliases.</li>
+<li>Users that want to use your list will pay you a one-time fee which you can set.</li>
+<li>Contract owner gets a small cut for every user subscribed (1-10% of the price).</li>
+</ol>
+</div>
+<div class="row">
+<p>What do you need to use this service:</p><br>
+<ol>
+<li>Access to the Ethereum network (Ropsten! for beta), for example via <a href="https://metamask.io/" target="_blank">Metamask</a> or similar.</li>
+<li>Ether (Ropsten) for the transactions.</li>
+</ol>
+</div>
+<hr>
+<div class="row footerr">
+<div class="col-12">
+<p>Dapp address: <span class="dapp_address"></span></p>
+<p>Dapp fee: <span class="dapp_fee">10%</span></p>
+<div class=""> &copy; Nikodem Tomczak 2018</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+
